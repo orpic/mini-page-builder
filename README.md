@@ -1,8 +1,25 @@
-# React + Vite
+# Mini page builder  
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+>Live - <https://mini-page-builder.web.app>
 
-Currently, two official plugins are available:
+## Run Locally
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Go to the project directory
+
+```bash
+  cd book-store-react
+```
+
+Install dependencies
+
+```bash
+  npm install
+```
+
+Start the server
+
+```bash
+  npm run dev
+```
+
+- Runs the app in the development mode.  

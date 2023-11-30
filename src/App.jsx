@@ -1,158 +1,88 @@
-import { useEffect, useState } from "react";
-import { images } from "./assets/images";
+import { useEffect, useRef, useState } from "react";
 
-const FROM_BLOCKS = "blocks";
-const blocksData = [
-  {
-    id: "label",
-    displayText: "Label",
-  },
-  {
-    id: "input",
-    displayText: "Input",
-  },
-  {
-    id: "button",
-    displayText: "Button",
-  },
-];
+import {
+  BOX_LIST_LOCAL_STORAGE_KEY,
+  FROM_BLOCKS,
+  FROM_DROPPED,
+  initialValueDialogs,
+} from "./constants";
+import { DialogBox, SideBar, TheBox } from "./components";
 
 function App() {
-  const initialValueDialogs = {
-    dialogHeading: "Label",
-    text: "",
-    xCoord: "",
-    yCoord: "",
-    fontSize: "",
-    fontWeight: "",
-  };
+  const containerRef = useRef(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogValues, setDialogValues] = useState(initialValueDialogs);
+
+  // {
+  //   uid: "",
+  //   id: "",
+  //   text: "",
+  //   xCoord: "",
+  //   yCoord: "",
+  //   fontSize: "",
+  //   fontWeight: "",
+  // }
+  const [boxList, setBoxList] = useState(() => {
+    const savedBoxList = localStorage.getItem(BOX_LIST_LOCAL_STORAGE_KEY);
+    return savedBoxList ? JSON.parse(savedBoxList) : [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem(BOX_LIST_LOCAL_STORAGE_KEY, JSON.stringify(boxList));
+  }, [boxList]);
+
+  const [selectedElementUID, setSelectedElementUID] = useState("");
+
+  const importBoxList = (file) => {
+    console.log(file);
+    try {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const content = event.target.result;
+        const importedList = JSON.parse(content);
+        setBoxList(importedList);
+      };
+      reader.readAsText(file);
+    } catch (error) {
+      console.error("Error importing boxList:", error);
+    }
+  };
+
+  const exportBoxList = () => {
+    try {
+      const jsonContent = JSON.stringify(boxList);
+      const blob = new Blob([jsonContent], { type: "application/json" });
+
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "boxList.json";
+      a.style.display = "none";
+      document.body.appendChild(a);
+      a.click();
+
+      URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error("Error exporting boxList:", error);
+    }
+  };
 
   return (
     <>
       {dialogOpen && (
-        <dialog
-          open={dialogOpen}
-          onKeyDown={(e) => {
-            console.log(e);
-            if (e.key.toString() === "Escape") {
-              // console.log("hi escape");
-              setDialogOpen(false);
-            }
-          }}
-          className=" z-10 absolute h-screen w-screen flex items-center justify-center bg-black/50 "
-        >
-          <div className="w-[96vw] h-[661px] xs:w-[424px] bg-white rounded-[5px]">
-            <div className="flex justify-between items-center pl-[21px] pr-[23px] pt-[18px] pb-[22px] border-b border-opacity-5 ">
-              <h2 className="text-xl font-semibold font-openSansFont">
-                Edit {dialogValues.dialogHeading}
-              </h2>
-              <img
-                onClick={() => {
-                  setDialogValues(initialValueDialogs);
-                  setDialogOpen(false);
-                }}
-                className="cursor-pointer"
-                src={images.crossOne}
-                alt="close"
-              />
-            </div>
-            <div className="mt-[25px] ml-[21px] mr-[24px]">
-              <div className="w-full mb-[33px]">
-                <p className="mb-[2px]">Text</p>
-                <input
-                  value={dialogValues.text}
-                  onChange={(e) => {
-                    //
-                    setDialogValues((prev) => ({
-                      ...prev,
-                      text: e.target.value,
-                    }));
-                  }}
-                  className="h-10 ring-1 ring-[#D9D9D9] w-full rounded-[1px] placeholder:text-[#595959] placeholder:w-full  px-3 outline-none"
-                  placeholder="This is a label"
-                />
-              </div>
-              <div className="w-full mb-[33px]">
-                <p className="mb-[2px]">X</p>
-                <input
-                  value={dialogValues.xCoord}
-                  onChange={(e) => {
-                    //
-                    const input = e.target.value;
-                    const numericValue = input.replace(/[^0-9]/g, "");
-                    setDialogValues((prev) => ({
-                      ...prev,
-                      xCoord: numericValue,
-                    }));
-                  }}
-                  className="h-10 ring-1 ring-[#D9D9D9] w-full rounded-[1px] placeholder:text-[#595959] placeholder:w-full  px-3 outline-none"
-                  placeholder=""
-                />
-              </div>
-              <div className="w-full mb-[33px]">
-                <p className="mb-[2px]">Y</p>
-                <input
-                  value={dialogValues.yCoord}
-                  onChange={(e) => {
-                    //
-                    const input = e.target.value;
-                    const numericValue = input.replace(/[^0-9]/g, "");
-                    setDialogValues((prev) => ({
-                      ...prev,
-                      yCoord: numericValue,
-                    }));
-                  }}
-                  className="h-10 ring-1 ring-[#D9D9D9] w-full rounded-[1px] placeholder:text-[#595959] placeholder:w-full  px-3 outline-none"
-                  placeholder=""
-                />
-              </div>
-              <div className="w-full mb-[33px]">
-                <p className="mb-[2px]">Font Size</p>
-                <input
-                  value={dialogValues.fontSize}
-                  onChange={(e) => {
-                    //
-                    setDialogValues((prev) => ({
-                      ...prev,
-                      fontSize: e.target.value,
-                    }));
-                  }}
-                  className="h-10 ring-1 ring-[#D9D9D9] w-full rounded-[1px] placeholder:text-[#595959] placeholder:w-full  px-3 outline-none"
-                  placeholder=""
-                />
-              </div>
-              <div className="w-full mb-[41px]">
-                <p className="mb-[2px]">Font Weight</p>
-                <input
-                  value={dialogValues.fontWeight}
-                  onChange={(e) => {
-                    //
-                    setDialogValues((prev) => ({
-                      ...prev,
-                      fontWeight: e.target.value,
-                    }));
-                  }}
-                  className="h-10 ring-1 ring-[#D9D9D9] w-full rounded-[1px] placeholder:text-[#595959] placeholder:w-full  px-3 outline-none"
-                  placeholder=""
-                />
-              </div>
-              <button
-                onClick={() => {
-                  //
-                  setDialogOpen(false);
-                }}
-                className="py-2 px-4 bg-[#0044C1] text-white rounded-[2px]"
-              >
-                Save Changes
-              </button>
-            </div>
-          </div>
-        </dialog>
+        <DialogBox
+          dialogOpen={dialogOpen}
+          setDialogOpen={setDialogOpen}
+          dialogValues={dialogValues}
+          setDialogValues={setDialogValues}
+          setBoxList={setBoxList}
+        />
       )}
       <div className="h-screen w-screen bg-green-500 flex relative">
         <div
+          ref={containerRef}
           id="pagedropzone"
           className="w-96 flex-grow bg-[#F3F3F3]"
           onDragOver={(e) => {
@@ -163,12 +93,15 @@ function App() {
           }}
           onDrop={(e) => {
             // console.log("onDrop", e);
+            e.preventDefault();
+            e.stopPropagation();
 
             // change to copy for plus sign
             e.dataTransfer.dropEffect = "copy";
 
             // get the coordinates for prefiling in the modal form
-            const container = e.target;
+            const container = containerRef.current;
+            // console.log(container);
             const rect = container.getBoundingClientRect();
             const offsetX = e.clientX - rect.left;
             const offsetY = e.clientY - rect.top;
@@ -178,61 +111,160 @@ function App() {
 
             const someData = e.dataTransfer.getData("application/json");
             const parsedData = JSON.parse(someData);
-            console.log("parsedData", parsedData);
+            // console.log("parsedData", parsedData);
+
+            // console.log(
+            //   parseInt(offsetX) - parseInt(parsedData?.mouseOffsetLeft)
+            // );
 
             if (parsedData?.from === FROM_BLOCKS) {
+              console.log(parsedData?.id);
               setDialogValues({
-                ...initialValueDialogs,
+                id: parsedData?.id,
+                placeholder:
+                  parsedData?.id === "label"
+                    ? "Label heading"
+                    : parsedData?.id === "input"
+                    ? "Input placeholder"
+                    : parsedData?.id === "button" && "Button name",
                 dialogHeading: parsedData?.heading,
-                xCoord: offsetX,
-                yCoord: offsetY,
+                xCoord:
+                  parseInt(offsetX) - parseInt(parsedData?.mouseOffsetLeft),
+                yCoord:
+                  parseInt(offsetY) - parseInt(parsedData?.mouseOffsetTop),
+                text: "",
+                fontSize: "",
+                fontWeight: "",
               });
               setDialogOpen(true);
             }
+
+            if (parsedData?.from === FROM_DROPPED) {
+              //
+              setBoxList((prev) => {
+                // const theBxo = prev.find((box) => box.uid === parsedData?.id);
+                // console.log(theBxo);
+                // console.log(prev);
+                const boxIndex = prev.findIndex(
+                  (box) => box.uid === parsedData?.id
+                );
+
+                if (boxIndex !== -1) {
+                  const newBox = {
+                    ...prev[boxIndex],
+                    xCoord:
+                      parseInt(offsetX) - parseInt(parsedData?.mouseOffsetLeft),
+                    yCoord:
+                      parseInt(offsetY) - parseInt(parsedData?.mouseOffsetTop),
+                  };
+                  const newList = [
+                    ...prev.slice(0, boxIndex),
+                    newBox,
+                    ...prev.slice(boxIndex + 1),
+                  ];
+
+                  return newList;
+                }
+
+                return prev;
+              });
+            }
           }}
         >
-          {/* <p
-            style={{
-              left: `${dialogValues.xCoord || 0}px`,
-              top: `${dialogValues.yCoord || 0}px`,
-            }}
-            className={`absolute`}
-          >
-            This is a label
-          </p> */}
-          <input className="w-72 p-3 ring-1 ring-[#D9D9D9] outline-none" />
-        </div>
-        <div className="w-[326px] bg-[#2D2D2D] h-full px-6">
-          <h2 className="mt-4 mb-4 text-white font-bold">BLOCKS</h2>
-          <ul className="flex flex-col gap-[9px]">
-            {blocksData.map((eachBlock) => (
-              <li
-                key={eachBlock.id}
-                id={eachBlock.id}
-                className="cursor-grab active:cursor-grabbing w-full bg-white p-2 font-light flex items-center gap-[10px] rounded opacity-[0.99]"
-                draggable
-                onDragStart={(e) => {
-                  const id = eachBlock.id;
-                  const displayText = eachBlock.displayText;
+          {boxList.map((eachBox) => {
+            {
+              /* console.log(eachBox); */
+            }
+            return (
+              <TheBox
+                id={eachBox.id}
+                uid={eachBox.uid}
+                text={eachBox?.text}
+                key={eachBox.uid}
+                xCoord={eachBox.xCoord}
+                yCoord={eachBox.yCoord}
+                onDragStartHandler={(e) => {
+                  const container = e.target;
+                  const rect = container.getBoundingClientRect();
+                  // console.log("rect", rect, e.clientX - rect.left, e.clientY - rect.top);
+                  // const id = eachBlock.id;
+
                   e.dataTransfer.setData(
                     "application/json",
                     JSON.stringify({
-                      id: id,
-                      heading: displayText,
-                      from: FROM_BLOCKS,
+                      id: eachBox.uid,
+                      from: FROM_DROPPED,
+                      mouseOffsetLeft: e.clientX - rect.left,
+                      mouseOffsetTop: e.clientY - rect.top,
                     })
                   );
                 }}
-              >
-                <img
-                  draggable={false}
-                  src={images.gripVertical}
-                  alt="grip vertical "
-                />
-                <p className="">{eachBlock.displayText}</p>
-              </li>
-            ))}
-          </ul>
+                selected={selectedElementUID === eachBox.uid}
+                onClickHandler={() => {
+                  setSelectedElementUID(eachBox.uid);
+                }}
+                onKeyDownHandler={(e) => {
+                  // console.log(e.key);
+                  // Enter
+                  // Delete
+                  // console.log(e);
+                  const presedKey = e.key;
+                  if (presedKey === "Enter") {
+                    let text = "";
+                    if (eachBox?.id === "label") {
+                      text = "This is a label";
+                    }
+                    if (eachBox?.id === "input") {
+                      text = "Input Box";
+                    }
+                    if (eachBox?.id === "button") {
+                      text = "Button name";
+                    }
+
+                    let textHeading = "";
+                    if (eachBox?.id === "label") {
+                      textHeading = "Label";
+                    }
+                    if (eachBox?.id === "input") {
+                      textHeading = "Input";
+                    }
+                    if (eachBox?.id === "button") {
+                      textHeading = "Button";
+                    }
+                    console.log(eachBox);
+                    setDialogValues({
+                      ...initialValueDialogs,
+                      uid: eachBox.uid,
+                      text: eachBox.text,
+                      id: eachBox.id,
+                      dialogHeading: textHeading,
+                      xCoord: eachBox.xCoord,
+                      yCoord: eachBox.yCoord,
+                      placeholder: text,
+                    });
+                    setDialogOpen(true);
+                  }
+
+                  if (presedKey === "Delete") {
+                    //
+                    setBoxList((prev) => {
+                      const updatedList = prev.filter(
+                        (box) => box.uid !== eachBox?.uid
+                      );
+                      return updatedList;
+                    });
+                  }
+                }}
+              />
+            );
+          })}
+        </div>
+        <div className="w-[326px] bg-[#2D2D2D] h-full flex flex-col px-6">
+          <SideBar
+            exportBoxList={exportBoxList}
+            importBoxList={importBoxList}
+          />
+          {/*  */}
         </div>
       </div>
     </>
