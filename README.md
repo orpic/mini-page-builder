@@ -4,10 +4,10 @@
 
 ## Run Locally
 
-Go to the project directory
+Go to the project directory  (please have node LTS installed on system )
 
 ```bash
-  cd book-store-react
+  cd mini-page-builder
 ```
 
 Install dependencies
