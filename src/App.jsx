@@ -32,6 +32,7 @@ function App() {
   }, [boxList]);
 
   const [selectedElementUID, setSelectedElementUID] = useState("");
+  const [movingElementUID, setMovingElementUID] = useState("");
 
   const importBoxList = (file) => {
     console.log(file);
@@ -183,7 +184,11 @@ function App() {
                 key={eachBox.uid}
                 xCoord={eachBox.xCoord}
                 yCoord={eachBox.yCoord}
+                onDragEndHandler={() => {
+                  setMovingElementUID("");
+                }}
                 onDragStartHandler={(e) => {
+                  setMovingElementUID(eachBox.uid);
                   const container = e.target;
                   const rect = container.getBoundingClientRect();
                   // console.log("rect", rect, e.clientX - rect.left, e.clientY - rect.top);
@@ -200,6 +205,7 @@ function App() {
                   );
                 }}
                 selected={selectedElementUID === eachBox.uid}
+                moving={movingElementUID === eachBox.uid}
                 onClickHandler={() => {
                   setSelectedElementUID(eachBox.uid);
                 }}

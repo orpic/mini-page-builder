@@ -7,9 +7,11 @@ export const TheBox = ({
   fontSize,
   fontWeight,
   onDragStartHandler,
+  onDragEndHandler,
   onClickHandler,
   selected = false,
   onKeyDownHandler,
+  moving = false,
 }) => {
   if (id === "label") {
     return (
@@ -24,9 +26,10 @@ export const TheBox = ({
           top: `${yCoord || 0}px`,
         }}
         className={`cursor-grab absolute outline-none ${
-          selected ? "ring-2 ring-[#D95409]" : ""
-        }`}
+          moving ? "opacity-50" : ""
+        } ${selected ? "ring-2 ring-[#D95409]" : ""}`}
         onDragStart={onDragStartHandler}
+        onDragEnd={onDragEndHandler}
       >
         {text}
       </p>
@@ -45,9 +48,10 @@ export const TheBox = ({
           top: `${yCoord || 0}px`,
         }}
         className={`cursor-grab absolute w-72 p-3 outline-none ${
-          selected ? "ring-2 ring-[#D95409]" : "ring-1 ring-[#D9D9D9]"
-        }`}
+          moving ? "opacity-50" : ""
+        } ${selected ? "ring-2 ring-[#D95409]" : "ring-1 ring-[#D9D9D9]"}`}
         onDragStart={onDragStartHandler}
+        onDragEnd={onDragEndHandler}
       />
     );
   }
@@ -63,9 +67,10 @@ export const TheBox = ({
           top: `${yCoord || 0}px`,
         }}
         className={`cursor-grab absolute bg-[#0044C1] p-3 text-white ${
-          selected ? "ring-2 ring-[#D95409]" : ""
-        }`}
+          moving ? "opacity-50" : ""
+        } ${selected ? "ring-2 ring-[#D95409]" : ""}`}
         onDragStart={onDragStartHandler}
+        onDragEnd={onDragEndHandler}
       >
         {text}
       </button>
