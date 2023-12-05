@@ -32,7 +32,9 @@ function App() {
   const undoLastItem = () => {
     setBoxList((prev) => {
       console.log("prev", prev);
+      if (prev.length === 0) return prev;
       const item = prev.pop();
+      if (item === undefined) return prev;
       console.log(item);
       setRedoBoxList((prev) => [...prev, item]);
       return prev;
@@ -41,7 +43,9 @@ function App() {
 
   const redoLastItem = () => {
     setRedoBoxList((prev) => {
+      if (prev.length === 0) return prev;
       const item = prev.pop();
+      if (item === undefined) return prev;
       setBoxList((prev) => [...prev, item]);
       return prev;
     });
@@ -192,98 +196,99 @@ function App() {
             }
           }}
         >
-          {boxList.map((eachBox) => {
-            {
-              /* console.log(eachBox); */
-            }
-            return (
-              <TheBox
-                id={eachBox.id}
-                uid={eachBox.uid}
-                text={eachBox?.text}
-                key={eachBox.uid}
-                xCoord={eachBox.xCoord}
-                yCoord={eachBox.yCoord}
-                onDragEndHandler={() => {
-                  setMovingElementUID("");
-                }}
-                onDragStartHandler={(e) => {
-                  setMovingElementUID(eachBox.uid);
-                  const container = e.target;
-                  const rect = container.getBoundingClientRect();
-                  // console.log("rect", rect, e.clientX - rect.left, e.clientY - rect.top);
-                  // const id = eachBlock.id;
+          {boxList.length >= 0 &&
+            boxList.map((eachBox) => {
+              {
+                /* console.log(eachBox); */
+              }
+              return (
+                <TheBox
+                  id={eachBox.id}
+                  uid={eachBox.uid}
+                  text={eachBox?.text}
+                  key={eachBox.uid}
+                  xCoord={eachBox.xCoord}
+                  yCoord={eachBox.yCoord}
+                  onDragEndHandler={() => {
+                    setMovingElementUID("");
+                  }}
+                  onDragStartHandler={(e) => {
+                    setMovingElementUID(eachBox.uid);
+                    const container = e.target;
+                    const rect = container.getBoundingClientRect();
+                    // console.log("rect", rect, e.clientX - rect.left, e.clientY - rect.top);
+                    // const id = eachBlock.id;
 
-                  e.dataTransfer.setData(
-                    "application/json",
-                    JSON.stringify({
-                      id: eachBox.uid,
-                      from: FROM_DROPPED,
-                      mouseOffsetLeft: e.clientX - rect.left,
-                      mouseOffsetTop: e.clientY - rect.top,
-                    })
-                  );
-                }}
-                selected={selectedElementUID === eachBox.uid}
-                moving={movingElementUID === eachBox.uid}
-                onClickHandler={() => {
-                  setSelectedElementUID(eachBox.uid);
-                }}
-                onKeyDownHandler={(e) => {
-                  // console.log(e.key);
-                  // Enter
-                  // Delete
-                  // console.log(e);
-                  const presedKey = e.key;
-                  if (presedKey === "Enter") {
-                    let text = "";
-                    if (eachBox?.id === "label") {
-                      text = "This is a label";
-                    }
-                    if (eachBox?.id === "input") {
-                      text = "Input Box";
-                    }
-                    if (eachBox?.id === "button") {
-                      text = "Button name";
+                    e.dataTransfer.setData(
+                      "application/json",
+                      JSON.stringify({
+                        id: eachBox.uid,
+                        from: FROM_DROPPED,
+                        mouseOffsetLeft: e.clientX - rect.left,
+                        mouseOffsetTop: e.clientY - rect.top,
+                      })
+                    );
+                  }}
+                  selected={selectedElementUID === eachBox.uid}
+                  moving={movingElementUID === eachBox.uid}
+                  onClickHandler={() => {
+                    setSelectedElementUID(eachBox.uid);
+                  }}
+                  onKeyDownHandler={(e) => {
+                    // console.log(e.key);
+                    // Enter
+                    // Delete
+                    // console.log(e);
+                    const presedKey = e.key;
+                    if (presedKey === "Enter") {
+                      let text = "";
+                      if (eachBox?.id === "label") {
+                        text = "This is a label";
+                      }
+                      if (eachBox?.id === "input") {
+                        text = "Input Box";
+                      }
+                      if (eachBox?.id === "button") {
+                        text = "Button name";
+                      }
+
+                      let textHeading = "";
+                      if (eachBox?.id === "label") {
+                        textHeading = "Label";
+                      }
+                      if (eachBox?.id === "input") {
+                        textHeading = "Input";
+                      }
+                      if (eachBox?.id === "button") {
+                        textHeading = "Button";
+                      }
+                      console.log(eachBox);
+                      setDialogValues({
+                        ...initialValueDialogs,
+                        uid: eachBox.uid,
+                        text: eachBox.text,
+                        id: eachBox.id,
+                        dialogHeading: textHeading,
+                        xCoord: eachBox.xCoord,
+                        yCoord: eachBox.yCoord,
+                        placeholder: text,
+                      });
+                      setDialogOpen(true);
                     }
 
-                    let textHeading = "";
-                    if (eachBox?.id === "label") {
-                      textHeading = "Label";
+                    if (presedKey === "Delete") {
+                      //
+                      setBoxList((prev) => {
+                        const updatedList = prev.filter(
+                          (box) => box.uid !== eachBox?.uid
+                        );
+                        return updatedList;
+                      });
                     }
-                    if (eachBox?.id === "input") {
-                      textHeading = "Input";
-                    }
-                    if (eachBox?.id === "button") {
-                      textHeading = "Button";
-                    }
-                    console.log(eachBox);
-                    setDialogValues({
-                      ...initialValueDialogs,
-                      uid: eachBox.uid,
-                      text: eachBox.text,
-                      id: eachBox.id,
-                      dialogHeading: textHeading,
-                      xCoord: eachBox.xCoord,
-                      yCoord: eachBox.yCoord,
-                      placeholder: text,
-                    });
-                    setDialogOpen(true);
-                  }
-
-                  if (presedKey === "Delete") {
-                    //
-                    setBoxList((prev) => {
-                      const updatedList = prev.filter(
-                        (box) => box.uid !== eachBox?.uid
-                      );
-                      return updatedList;
-                    });
-                  }
-                }}
-              />
-            );
-          })}
+                  }}
+                />
+              );
+            })}
         </div>
         <div className="w-[326px] bg-[#2D2D2D] h-full flex flex-col px-6">
           <SideBar
