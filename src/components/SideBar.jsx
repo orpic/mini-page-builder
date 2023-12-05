@@ -1,7 +1,12 @@
 import { images } from "../assets/images";
 import { FROM_BLOCKS, blocksData } from "../constants";
 
-export const SideBar = ({ importBoxList, exportBoxList }) => {
+export const SideBar = ({
+  importBoxList,
+  exportBoxList,
+  undoFunc,
+  redoFunc,
+}) => {
   return (
     <>
       <h2 className="mt-4 mb-4 text-white font-bold">BLOCKS</h2>
@@ -46,6 +51,18 @@ export const SideBar = ({ importBoxList, exportBoxList }) => {
         ))}
       </ul>
       <div className="flex flex-col mt-auto pb-4 gap-2">
+        <button
+          onClick={undoFunc}
+          className="bg-gray-400 py-2 rounded-md font-semibold text-lg"
+        >
+          UNDO
+        </button>
+        <button
+          onClick={redoFunc}
+          className="bg-gray-400 py-2 rounded-md font-semibold text-lg"
+        >
+          REDO
+        </button>
         <button
           onClick={exportBoxList}
           className="bg-gray-400 py-2 rounded-md font-semibold text-lg"

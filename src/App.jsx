@@ -27,6 +27,26 @@ function App() {
     return savedBoxList ? JSON.parse(savedBoxList) : [];
   });
 
+  const [redoBoxList, setRedoBoxList] = useState([]);
+
+  const undoLastItem = () => {
+    setBoxList((prev) => {
+      console.log("prev", prev);
+      const item = prev.pop();
+      console.log(item);
+      setRedoBoxList((prev) => [...prev, item]);
+      return prev;
+    });
+  };
+
+  const redoLastItem = () => {
+    setRedoBoxList((prev) => {
+      const item = prev.pop();
+      setBoxList((prev) => [...prev, item]);
+      return prev;
+    });
+  };
+
   useEffect(() => {
     localStorage.setItem(BOX_LIST_LOCAL_STORAGE_KEY, JSON.stringify(boxList));
   }, [boxList]);
@@ -269,6 +289,8 @@ function App() {
           <SideBar
             exportBoxList={exportBoxList}
             importBoxList={importBoxList}
+            redoFunc={redoLastItem}
+            undoFunc={undoLastItem}
           />
           {/*  */}
         </div>
